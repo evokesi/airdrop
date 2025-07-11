@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVSI Airdrop</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body { font-family: monospace; background: #000; color: #0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+    .container { background: #111; border-radius: 1rem; padding: 2rem; box-shadow: 0 0 20px #0f0; max-width: 500px; width: 100%; text-align: center; }
+    h1 { margin-bottom: 1rem; }
+    input, button { padding: 1rem; width: 100%; margin: 0.5rem 0; font-size: 1rem; }
+    input { background: #222; border: 1px solid #0f0; color: #0f0; border-radius: 0.5rem; }
+    button { background: #0f0; color: #000; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: bold; }
+    #status { margin-top: 1rem; color: #0f0; }
+    .note { font-size: 0.8rem; color: #888; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>EVSI Airdrop Claim</h1>
+    <p>Connect wallet to get your free EVSI + referral link</p>
+    <button id="connectBtn">Connect Wallet</button>
+    <div id="airdropInfo" style="display:none">
+      <p>Your address:</p>
+      <input id="walletAddress" readonly>
+      <p>Share this link to earn more:</p>
+      <input id="referralLink" readonly>
+      <button onclick="copyReferral()">Copy Referral Link</button>
+      <div class="note">Airdrop is limited. Invite friends to earn more!</div>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    const baseURL = "https://evokesi.github.io/airdrop/?ref=";
+
+    const connectBtn = document.getElementById("connectBtn");
+    const walletInput = document.getElementById("walletAddress");
+    const referralInput = document.getElementById("referralLink");
+    const airdropInfo = document.getElementById("airdropInfo");
+    const status = document.getElementById("status");
+
+    connectBtn.onclick = async () => {
+      try {
+        if (!window.ethereum) throw new Error("MetaMask is not installed");
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        const userAddress = accounts[0];
+        walletInput.value = userAddress;
+        referralInput.value = `${baseURL}${userAddress}`;
+        airdropInfo.style.display = "block";
+        status.innerText = "✅ Connected. Share your referral link.";
+      } catch (err) {
+        status.innerText = `❌ ${err.message}`;
+      }
+    };
+
+    function copyReferral() {
+      referralInput.select();
+      document.execCommand("copy");
+      status.innerText = "✅ Link copied to clipboard!";
+    }
+  </script>
+</body>
+</html>
